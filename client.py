@@ -6,6 +6,7 @@ import sys
 url = sys.argv[1]
 fName = sys.argv[2]
 
+DEBUG = False
 
 
 #extract the hostname
@@ -30,7 +31,7 @@ if (fileN[-1] == "/"):
 TCP_IP = socket.gethostbyname(url)
 
 TCP_PORT = 80 
-BUFFER_SIZE = 2048
+BUFFER_SIZE = 1048
 
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -41,20 +42,20 @@ MESSAGE += "Host: " + url + " \r\n\r\n"
 
 s.send(MESSAGE)
 
-#need to loop based on the fact that the data we got may only be partial loop
 
-
-#Parse the return code from the response
 
 
 #actual stuff got saze to the file
-
 data = s.recv(BUFFER_SIZE)
 
-hSize = data.find("\r\n\r\n")
+hSize = data.find("\r\n\r\n")+4
 header = data[:hSize]
 
+
+
 #check success
+if DEBUG:
+    print data
 if (header[9:12] == "200"):
     data = data[hSize:]
     fileSize = header.find("Content-Length: ") + 16
@@ -63,11 +64,19 @@ if (header[9:12] == "200"):
     sizeOfFile = header[fileSize:fileSize+sizeEnd]
     sizeOfFile = int(sizeOfFile)
 
-    recvCount = sizeOfFile/BUFFER_SIZE + 1
     
-    while (recvCount >= 0):
+    recvCount = sizeOfFile/BUFFER_SIZE 
+    
+    if DEBUG:
+        print "size of file is: " , sizeOfFile
+        print "size of buffer is: ", BUFFER_SIZE
+        print "Number of needed iterations is", recvCount
+
+    sumDataSize = sys.getsizeof(data)
+    
+    while (sys.getsizeof(data) < sizeOfFile):
         data += s.recv(BUFFER_SIZE)
-        recvCount -= 1
+
 
 s.close()
 if (header[9:12] == "200"):
