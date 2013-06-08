@@ -8,19 +8,24 @@ fName = sys.argv[2]
 
 DEBUG = False
 
-
 #extract the hostname
 if (url[0:11] == "http://www."):
     url = url[11:]
 if (url[0:7] == "http://"):
     url = url[7:]
 if (url[0:3] == "www"):
-    url = url[3:]
-
+    url = url[4:]
 
 locN = url.find("/")
-fileN = url[locN:]
-url = url[:locN]
+
+if (locN == -1):
+    url += "/"
+    fileN = url[locN:]
+    url = url[:locN]
+else:
+    fileN = url[locN:]
+    url = url[:locN]
+
 
 
 if (fileN[-1] == "/"):
@@ -30,8 +35,9 @@ if (fileN[-1] == "/"):
 #DNS lookup to retrieve the IP address for the server using
 TCP_IP = socket.gethostbyname(url)
 
+
 TCP_PORT = 80 
-BUFFER_SIZE = 1048
+BUFFER_SIZE = 1028
 
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -79,7 +85,6 @@ if (header[9:12] == "200"):
 
 
 s.close()
-if (header[9:12] == "200"):
-    f = open ('/Users/tylerfetters/Desktop/CS594/Project3/Project3/Project3/'+fName , 'w')
-    f.write (data)
+f = open ('/Users/tylerfetters/Desktop/CS594/Project3/Project3/Project3/'+fName , 'w')
+f.write (data)
 
